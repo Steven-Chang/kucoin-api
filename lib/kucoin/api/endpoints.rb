@@ -38,6 +38,9 @@ module Kucoin
         fills: {
           index:              '/api/v1/fills',
           recent:             '/api/v1/limit/fills',
+        },
+        margin: {
+          create:             '/api/v1/margin/order'
         }
       },
       markets: {

@@ -41,6 +41,10 @@ module Kucoin
 
         private
 
+        def margin_models
+          %w(cross isolated)
+        end
+
         def side_types
           %w(buy sell)
         end

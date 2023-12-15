@@ -12,6 +12,11 @@ module Kucoin
             auth.ku_request :post, :create, **options
           end
           alias place create
+
+          # https://www.kucoin.com/docs/rest/margin-trading/isolated-margin/get-single-isolated-margin-account-info
+          def isolated_account(symbol)
+            auth.ku_request :get, :isolated_account, symbol:
+          end
         end
       end
     end

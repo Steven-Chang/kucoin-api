@@ -40,7 +40,8 @@ module Kucoin
           recent:             '/api/v1/limit/fills',
         },
         margin: {
-          create:             '/api/v1/margin/order'
+          create:             '/api/v1/margin/order',
+          isolated_account:   '/api/v1/isolated/account/:symbol'
         }
       },
       markets: {

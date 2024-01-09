@@ -3,31 +3,36 @@ module Kucoin
   module Api
     class REST
       BASE_URL          = 'https://openapi-v2.kucoin.com'.freeze
+      FUTURES_BASE_URL = 'https://api-futures.kucoin.com'.freeze
       SANDBOX_BASE_URL  = 'https://openapi-sandbox.kucoin.com'.freeze
 
       extend Kucoin::Api::Endpoints
       generate_endpoint_methods
 
-      attr_reader :api_key, :api_secret, :api_passphrase
-      attr_reader :adapter
+      attr_reader :adapter, :api_key, :api_secret, :api_passphrase, :futures
 
       def initialize(
           api_key: Kucoin::Api.default_key, 
           api_secret: Kucoin::Api.default_secret, 
           api_passphrase: Kucoin::Api.default_passphrase, 
           adapter: Faraday.default_adapter, 
-          sandbox: false
+          sandbox: false,
+          futures: false
         )
         @api_key = api_key
         @api_secret = api_secret
         @api_passphrase = api_passphrase
         @adapter = adapter
         @sandbox = sandbox
+        @futures = futures
       end
 
       def sandbox?; @sandbox == true end
 
+      # Currently it does not handle sandbox for futures
       def base_url
+        return FUTURES_BASE_URL if @futures
+
         sandbox? ? SANDBOX_BASE_URL : BASE_URL
       end
 

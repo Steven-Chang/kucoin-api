@@ -3,6 +3,7 @@ module Kucoin
   module Api
     class REST
       BASE_URL          = 'https://openapi-v2.kucoin.com'.freeze
+      FUTURES_BASE_URL = 'https://api-futures.kucoin.com'.freeze
       SANDBOX_BASE_URL  = 'https://openapi-sandbox.kucoin.com'.freeze
 
       extend Kucoin::Api::Endpoints
@@ -16,18 +17,23 @@ module Kucoin
           api_secret: Kucoin::Api.default_secret, 
           api_passphrase: Kucoin::Api.default_passphrase, 
           adapter: Faraday.default_adapter, 
-          sandbox: false
+          sandbox: false,
+          futures: false
         )
         @api_key = api_key
         @api_secret = api_secret
         @api_passphrase = api_passphrase
         @adapter = adapter
         @sandbox = sandbox
+        @futures = futures
       end
 
       def sandbox?; @sandbox == true end
 
+      # Currently it does not handle sandbox for futures
       def base_url
+        return FUTURES_BASE_URL if @futures
+
         sandbox? ? SANDBOX_BASE_URL : BASE_URL
       end
 

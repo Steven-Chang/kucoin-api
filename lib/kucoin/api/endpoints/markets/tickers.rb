@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module Kucoin
   module Api
     module Endpoints
@@ -9,7 +10,7 @@ module Kucoin
           end
           alias all index
 
-          def inside symbol
+          def inside(symbol)
             open.ku_request :get, :inside, symbol: symbol
           end
         end

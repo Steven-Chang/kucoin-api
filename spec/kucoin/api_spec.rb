@@ -1,9 +1,11 @@
+# frozen_string_literal: true
+
 RSpec.describe Kucoin::Api do
-  it "has a version number" do
+  it 'has a version number' do
     expect(Kucoin::Api::VERSION).not_to be nil
   end
 
-  it "has endpoints" do
+  it 'has endpoints' do
     expect(Kucoin::Api::ENDPOINTS).to be_a Hash
   end
 

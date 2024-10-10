@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 RSpec.describe Kucoin::Api::REST::Connection do
   let(:endpoint) { Kucoin::Api::Endpoints::Base.new(Kucoin::Api::REST.new) }
   let(:options) { { url: 'http://example.com/' } }
@@ -10,7 +12,7 @@ RSpec.describe Kucoin::Api::REST::Connection do
     let(:request_url)     { 'http://example.com' }
     let(:request_body)    { '' }
     let(:response_status) { 200 }
-    let(:response_body)   { {code: '200000', success: true, data: { foo: :bar }} }
+    let(:response_body)   { { code: '200000', success: true, data: { foo: :bar } } }
 
     before do
       allow(endpoint.client).to receive(:base).and_return(endpoint)
@@ -24,43 +26,59 @@ RSpec.describe Kucoin::Api::REST::Connection do
     context 'get' do
       let(:request_url) { 'http://example.com/v1/base/all?arg1=foo&arg2=bar' }
       context 'valid response' do
-        it { expect(subject.ku_request(request_method, :all, arg1: :foo, arg2: :bar)).to eq({"foo"=>"bar"}) }
+        it { expect(subject.ku_request(request_method, :all, arg1: :foo, arg2: :bar)).to eq({ 'foo' => 'bar' }) }
 
         context 'having path attributes' do
           let(:endpoint_url)    { 'v1/base/:foo/all' }
           let(:request_url)     { 'http://example.com/v1/base/bar/all' }
-          it { expect(subject.ku_request(request_method, :all, foo: :bar)).to eq({"foo"=>"bar"}) }
+          it { expect(subject.ku_request(request_method, :all, foo: :bar)).to eq({ 'foo' => 'bar' }) }
         end
       end
 
       context 'invalid response' do
         context 'not found' do
           let(:response_status) { 404 }
-          let(:response_body)   { {"timestamp"=>1546519594045, "status"=>404, "error"=>"Not Found", "message"=>"No message available", "path"=>"/account/foo/withdraw/cancel"} }
+          let(:response_body)   do
+            { 'timestamp' => 1_546_519_594_045, 'status' => 404, 'error' => 'Not Found', 'message' => 'No message available',
+              'path' => '/account/foo/withdraw/cancel' }
+          end
 
-          it { expect { subject.ku_request(request_method, :all, arg1: :foo, arg2: :bar) }.to raise_error(Kucoin::Api::ClientError, /404 - No message available/) }
+          it {
+            expect do
+              subject.ku_request(request_method, :all, arg1: :foo,
+                                                       arg2: :bar)
+            end.to raise_error(Kucoin::Api::ClientError, /404 - No message available/)
+          }
         end
         context 'invalid params' do
           let(:response_status) { 404 }
-          let(:response_body)   { { "code": "400100", "msg": "Invalid Parameter." } }
+          let(:response_body)   { { "code": '400100', "msg": 'Invalid Parameter.' } }
 
-          it { expect { subject.ku_request(request_method, :all, arg1: :foo, arg2: :bar) }.to raise_error(Kucoin::Api::ClientError, /400100 - Invalid Parameter./) }
+          it {
+            expect do
+              subject.ku_request(request_method, :all, arg1: :foo,
+                                                       arg2: :bar)
+            end.to raise_error(Kucoin::Api::ClientError, /400100 - Invalid Parameter./)
+          }
         end
       end
     end
 
     context 'post' do
-      let(:request_method)  { :post }
+      let(:request_method) { :post }
       let(:request_body) { { arg1: 'foo', arg2: 'bar' } }
       let(:request_url) { 'http://example.com/v1/base/all' }
 
       context 'valid response' do
-        it { expect(subject.ku_request(request_method, :all, arg1: :foo, arg2: :bar)).to eq({"foo"=>"bar"}) }
+        it { expect(subject.ku_request(request_method, :all, arg1: :foo, arg2: :bar)).to eq({ 'foo' => 'bar' }) }
 
         context 'having path attributes' do
-          let(:endpoint_url)    { 'v1/base/:foo/all' }
+          let(:endpoint_url) { 'v1/base/:foo/all' }
           let(:request_url) { 'http://example.com/v1/base/bar/all' }
-          it { expect(subject.ku_request(request_method, :all, arg1: :foo, arg2: :bar, foo: :bar)).to eq({"foo"=>"bar"}) }
+          it {
+            expect(subject.ku_request(request_method, :all, arg1: :foo, arg2: :bar,
+                                                            foo: :bar)).to eq({ 'foo' => 'bar' })
+          }
         end
       end
     end

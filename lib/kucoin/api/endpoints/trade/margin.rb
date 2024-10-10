@@ -13,9 +13,21 @@ module Kucoin
           end
           alias place create
 
+          # https://www.kucoin.com/docs/rest/margin-trading/margin-trading-v3-/margin-borrowing
+          def borrow(currency, size, time_in_force, options = {})
+            options = { currency: currency, size: size, timeInForce: time_in_force }.merge(options)
+            auth.ku_request :post, :borrow, **options
+          end
+
           # https://www.kucoin.com/docs/rest/margin-trading/isolated-margin/get-single-isolated-margin-account-info
           def isolated_account(symbol)
             auth.ku_request :get, :isolated_account, symbol:
+          end
+
+          # https://www.kucoin.com/docs/rest/margin-trading/margin-trading-v3-/repayment
+          def repay(currency, size, options = {})
+            options = { currency: currency, size: size }.merge(options)
+            auth.ku_request :post, :repay, **options
           end
         end
       end

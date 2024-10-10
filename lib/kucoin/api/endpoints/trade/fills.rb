@@ -1,10 +1,11 @@
 # frozen_string_literal: true
+
 module Kucoin
   module Api
     module Endpoints
       class Trade
         class Fills < Trade
-          def index options={}
+          def index(options = {})
             auth.ku_request :get, :index, **options
           end
           alias all index

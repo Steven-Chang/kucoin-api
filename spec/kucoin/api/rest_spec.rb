@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 RSpec.describe Kucoin::Api::REST do
   let(:client) { described_class.new }
   let(:endpoint) { Kucoin::Api::Endpoints::Base.new(client) }
@@ -6,31 +8,37 @@ RSpec.describe Kucoin::Api::REST do
   it { expect(described_class::BASE_URL).to eq 'https://openapi-v2.kucoin.com' }
   it { expect(described_class::SANDBOX_BASE_URL).to eq 'https://openapi-sandbox.kucoin.com' }
 
-  describe "endpoint_methods" do
-    Kucoin::Api::ENDPOINTS.keys.each do |endpoint_name|
-      it "#{endpoint_name}" do
+  describe 'endpoint_methods' do
+    Kucoin::Api::ENDPOINTS.each_key do |endpoint_name|
+      it endpoint_name.to_s do
         expect(subject.public_send(endpoint_name)).to be_a Kucoin::Api::Endpoints.get_klass(endpoint_name, nil)
         expect(subject.public_send(endpoint_name).client).to eq subject
       end
     end
 
-    Kucoin::Api::ENDPOINTS[:user].keys.each do |endpoint_name|
-      it "#{endpoint_name}" do
-        expect(subject.public_send(:user).public_send(endpoint_name)).to be_a Kucoin::Api::Endpoints.get_klass(endpoint_name, Kucoin::Api::Endpoints::User)
+    Kucoin::Api::ENDPOINTS[:user].each_key do |endpoint_name|
+      it endpoint_name.to_s do
+        expect(subject.public_send(:user).public_send(endpoint_name)).to be_a Kucoin::Api::Endpoints.get_klass(
+          endpoint_name, Kucoin::Api::Endpoints::User
+        )
         expect(subject.public_send(:user).public_send(endpoint_name).client).to eq subject
       end
     end
 
-    Kucoin::Api::ENDPOINTS[:trade].keys.each do |endpoint_name|
-      it "#{endpoint_name}" do
-        expect(subject.public_send(:trade).public_send(endpoint_name)).to be_a Kucoin::Api::Endpoints.get_klass(endpoint_name, Kucoin::Api::Endpoints::Trade)
+    Kucoin::Api::ENDPOINTS[:trade].each_key do |endpoint_name|
+      it endpoint_name.to_s do
+        expect(subject.public_send(:trade).public_send(endpoint_name)).to be_a Kucoin::Api::Endpoints.get_klass(
+          endpoint_name, Kucoin::Api::Endpoints::Trade
+        )
         expect(subject.public_send(:trade).public_send(endpoint_name).client).to eq subject
       end
     end
 
-    Kucoin::Api::ENDPOINTS[:markets].select {|x,v| v.is_a?(Hash) }.keys.each do |endpoint_name|
-      it "#{endpoint_name}" do
-        expect(subject.public_send(:markets).public_send(endpoint_name)).to be_a Kucoin::Api::Endpoints.get_klass(endpoint_name, Kucoin::Api::Endpoints::Markets)
+    Kucoin::Api::ENDPOINTS[:markets].select { |_x, v| v.is_a?(Hash) }.each_key do |endpoint_name|
+      it endpoint_name.to_s do
+        expect(subject.public_send(:markets).public_send(endpoint_name)).to be_a Kucoin::Api::Endpoints.get_klass(
+          endpoint_name, Kucoin::Api::Endpoints::Markets
+        )
         expect(subject.public_send(:markets).public_send(endpoint_name).client).to eq subject
       end
     end
@@ -48,7 +56,8 @@ RSpec.describe Kucoin::Api::REST do
 
   describe '#open' do
     it do
-      expect(Kucoin::Api::REST::Connection).to receive(:new).with(endpoint, url: Kucoin::Api::REST::BASE_URL).and_call_original
+      expect(Kucoin::Api::REST::Connection).to receive(:new).with(endpoint,
+                                                                  url: Kucoin::Api::REST::BASE_URL).and_call_original
       connection = subject.open(endpoint)
       expect(connection.client.builder.handlers).to include(FaradayMiddleware::EncodeJson, FaradayMiddleware::ParseJson)
     end
@@ -57,9 +66,11 @@ RSpec.describe Kucoin::Api::REST do
   describe '#auth' do
     let(:client) { described_class.new(api_key: 'foo', api_secret: 'bar') }
     it do
-      expect(Kucoin::Api::REST::Connection).to receive(:new).with(endpoint, url: Kucoin::Api::REST::BASE_URL).and_call_original
+      expect(Kucoin::Api::REST::Connection).to receive(:new).with(endpoint,
+                                                                  url: Kucoin::Api::REST::BASE_URL).and_call_original
       connection = subject.auth(endpoint)
-      expect(connection.client.builder.handlers).to include(FaradayMiddleware::EncodeJson, FaradayMiddleware::ParseJson, Kucoin::Api::Middleware::NonceRequest, Kucoin::Api::Middleware::AuthRequest)
+      expect(connection.client.builder.handlers).to include(FaradayMiddleware::EncodeJson,
+                                                            FaradayMiddleware::ParseJson, Kucoin::Api::Middleware::NonceRequest, Kucoin::Api::Middleware::AuthRequest)
     end
   end
 end

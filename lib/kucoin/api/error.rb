@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Kucoin
   module Api
     class Error < StandardError; end

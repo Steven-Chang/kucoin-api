@@ -1,10 +1,11 @@
 # frozen_string_literal: true
+
 module Kucoin
   module Api
     class REST
-      BASE_URL          = 'https://openapi-v2.kucoin.com'.freeze
-      FUTURES_BASE_URL = 'https://api-futures.kucoin.com'.freeze
-      SANDBOX_BASE_URL  = 'https://openapi-sandbox.kucoin.com'.freeze
+      BASE_URL = 'https://openapi-v2.kucoin.com'
+      FUTURES_BASE_URL = 'https://api-futures.kucoin.com'
+      SANDBOX_BASE_URL = 'https://openapi-sandbox.kucoin.com'
 
       extend Kucoin::Api::Endpoints
       generate_endpoint_methods
@@ -12,13 +13,13 @@ module Kucoin
       attr_reader :adapter, :api_key, :api_secret, :api_passphrase, :futures
 
       def initialize(
-          api_key: Kucoin::Api.default_key, 
-          api_secret: Kucoin::Api.default_secret, 
-          api_passphrase: Kucoin::Api.default_passphrase, 
-          adapter: Faraday.default_adapter, 
-          sandbox: false,
-          futures: false
-        )
+        api_key: Kucoin::Api.default_key,
+        api_secret: Kucoin::Api.default_secret,
+        api_passphrase: Kucoin::Api.default_passphrase,
+        adapter: Faraday.default_adapter,
+        sandbox: false,
+        futures: false
+      )
         @api_key = api_key
         @api_secret = api_secret
         @api_passphrase = api_passphrase
@@ -27,7 +28,9 @@ module Kucoin
         @futures = futures
       end
 
-      def sandbox?; @sandbox == true end
+      def sandbox?
+        @sandbox == true
+      end
 
       # Currently it does not handle sandbox for futures
       def base_url
@@ -36,7 +39,7 @@ module Kucoin
         sandbox? ? SANDBOX_BASE_URL : BASE_URL
       end
 
-      def open endpoint
+      def open(endpoint)
         Connection.new(endpoint, url: base_url) do |conn|
           conn.request :json
           conn.response :json, content_type: 'application/json'
@@ -44,7 +47,7 @@ module Kucoin
         end
       end
 
-      def auth endpoint
+      def auth(endpoint)
         Connection.new(endpoint, url: base_url) do |conn|
           conn.request :json
           conn.response :json, content_type: 'application/json'

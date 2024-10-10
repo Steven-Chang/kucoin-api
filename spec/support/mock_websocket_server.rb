@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class MockWebsocketServer
   HOST      = '0.0.0.0'
   PORT      = 0
@@ -9,13 +11,13 @@ class MockWebsocketServer
   end
 
   def _endpoint
-    port, host = Socket.unpack_sockaddr_in( EM.get_sockname( @signature ))
+    port, host = Socket.unpack_sockaddr_in(EM.get_sockname(@signature))
     "wss://#{host}:#{port}/endpoint"
   end
 
   def start
     @signature = EM.start_server(HOST, PORT, MockWebsocketConnection) do |mock_connection|
-      self.connections << mock_connection
+      connections << mock_connection
       mock_connection.server = self
     end
   end
@@ -23,10 +25,10 @@ class MockWebsocketServer
   def stop
     EM.stop_server(@signature)
 
-    unless wait_for_connections_and_stop
-      # Still some connections running, schedule a check later
-      EM.add_periodic_timer(1) { wait_for_connections_and_stop }
-    end
+    return if wait_for_connections_and_stop
+
+    # Still some connections running, schedule a check later
+    EM.add_periodic_timer(1) { wait_for_connections_and_stop }
   end
 
   def wait_for_connections_and_stop
@@ -47,7 +49,7 @@ class MockWebsocketConnection < EventMachine::Connection
   def initialize
     @driver = WebSocket::Driver.server(self)
 
-    driver.on(:connect) do |e|
+    driver.on(:connect) do |_e|
       logger.debug '[WEBSOCKET - SERVER] CONNECT'
       driver.start if WebSocket::Driver.websocket? driver.env
     end
@@ -56,7 +58,7 @@ class MockWebsocketConnection < EventMachine::Connection
       driver.frame(server.response_message.merge(data: JSON.parse(e.data)).to_json)
       close_connection_after_writing
     end
-    driver.on(:close) do |e|
+    driver.on(:close) do |_e|
       logger.debug '[WEBSOCKET - SERVER] CLOSE'
       close_connection_after_writing
     end
@@ -71,7 +73,7 @@ class MockWebsocketConnection < EventMachine::Connection
     send_data(data)
   end
 
-  def receive_data data
+  def receive_data(data)
     driver.parse(data)
   end
 
@@ -80,7 +82,7 @@ class MockWebsocketConnection < EventMachine::Connection
   end
 end
 
-def mock_websocket_server response_message=nil, &block
+def mock_websocket_server(response_message = nil, &block)
   EM.run do
     mock_server = MockWebsocketServer.new
     mock_server.response_message = response_message || { foo: :bar }
@@ -90,10 +92,10 @@ def mock_websocket_server response_message=nil, &block
   end
 end
 
-def mock_websocket_client_methods mock_server, response_message
+def mock_websocket_client_methods(mock_server, response_message)
   error   = proc { |e| logger.debug "[WEBSOCKET - CLIENT] ERROR : #{e.message}" }
-  close   = proc { |e| logger.debug "[WEBSOCKET - CLIENT] CLOSED" }
-  open    = proc { |e| logger.debug "[WEBSOCKET - CLIENT] OPEN" }
+  close   = proc { |_e| logger.debug '[WEBSOCKET - CLIENT] CLOSED' }
+  open    = proc { |_e| logger.debug '[WEBSOCKET - CLIENT] OPEN' }
   message = proc do |e|
     logger.debug "[WEBSOCKET - CLIENT] : #{e.data}"
     expect(JSON.parse(e.data)['data']).to eq(response_message)

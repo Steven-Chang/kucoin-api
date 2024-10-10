@@ -21,6 +21,10 @@ module Kucoin
           # member
           show:             '/api/v1/deposit-addresses?currency=:currency',
         },
+        funding: {
+          cross:            '/api/v3/margin/accounts',
+          isolated:         '/api/v3/isolated/accounts',
+        },
         withdrawals: {
           index:            '/api/v1/withdrawals',
           quotas:           '/api/v1/withdrawals/quotas',

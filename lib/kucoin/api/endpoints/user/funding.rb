@@ -10,6 +10,11 @@ module Kucoin
             auth.ku_request :get, :cross, **options
           end
 
+          # https://www.kucoin.com/docs/rest/funding/funding-overview/get-account-detail-futures
+          def futures_account_detail(currency)
+            auth.ku_request :get, :futures_account_detail, currency:
+          end
+
           # https://www.kucoin.com/docs/rest/funding/funding-overview/get-account-detail-isolated-margin
           def isolated(options = {})
             auth.ku_request :get, :isolated, **options

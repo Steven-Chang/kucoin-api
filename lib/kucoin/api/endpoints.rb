@@ -24,6 +24,7 @@ module Kucoin
         },
         funding: {
           cross: '/api/v3/margin/accounts',
+          futures_account_detail: '/api/v1/account-overview',
           isolated: '/api/v3/isolated/accounts'
         },
         withdrawals: {

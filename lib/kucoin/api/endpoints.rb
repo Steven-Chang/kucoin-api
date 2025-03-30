@@ -13,7 +13,8 @@ module Kucoin
           # member
           show: '/api/v1/accounts/:account_id',
           ledgers: '/api/v1/accounts/:account_id/ledgers',
-          holds: '/api/v1/accounts/:account_id/holds'
+          holds: '/api/v1/accounts/:account_id/holds',
+          transfer_to_futures_account: '/api/v1/transfer-in'
         },
         deposits: {
           create: '/api/v1/deposit-addresses',

@@ -36,6 +36,11 @@ module Kucoin
           def holds(account_id)
             auth.ku_request :get, :holds, account_id: account_id
           end
+
+          # https://www.kucoin.com/docs/rest/funding/transfer/transfer-to-futures-account
+          def transfer_to_futures_account(amount, currency, pay_account_type)
+            auth.ku_request :post, :transfer_to_futures_account, amount:, currency:, payAccountType: pay_account_type
+          end
         end
       end
     end

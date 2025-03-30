@@ -14,6 +14,7 @@ module Kucoin
           show: '/api/v1/accounts/:account_id',
           ledgers: '/api/v1/accounts/:account_id/ledgers',
           holds: '/api/v1/accounts/:account_id/holds',
+          transfer_from_futures_account: '/api/v3/transfer-out',
           transfer_to_futures_account: '/api/v1/transfer-in'
         },
         deposits: {

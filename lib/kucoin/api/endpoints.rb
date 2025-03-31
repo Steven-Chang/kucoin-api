@@ -51,6 +51,9 @@ module Kucoin
           borrow: '/api/v3/margin/borrow',
           isolated_account: '/api/v1/isolated/account/:symbol',
           repay: '/api/v3/margin/repay'
+        },
+        stops: {
+          index: '/api/v1/stop-order'
         }
       },
       markets: {

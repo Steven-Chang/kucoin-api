@@ -45,20 +45,24 @@ module Kucoin
 
         private
 
-        def margin_models
-          %w[cross isolated]
+        def account_types
+          %w[main trade]
         end
 
-        def side_types
-          %w[buy sell]
+        def margin_models
+          %w[cross isolated]
         end
 
         def order_types
           %w[limit market]
         end
 
-        def account_types
-          %w[main trade]
+        def side_types
+          %w[buy sell]
+        end
+
+        def stop_trade_types
+          %w[MARGIN_ISOLATED_TRADE MARGIN_TRADE TRADE]
         end
       end
     end

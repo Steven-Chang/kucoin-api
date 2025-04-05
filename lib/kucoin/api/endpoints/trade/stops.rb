@@ -5,6 +5,11 @@ module Kucoin
     module Endpoints
       class Trade
         class Stops < Trade
+          # https://www.kucoin.com/docs/rest/spot-trading/stop-order/get-stop-orders-list
+          def index(options = {})
+            auth.ku_request :get, :index, **options
+          end
+
           # https://www.kucoin.com/docs/rest/spot-trading/stop-order/place-order
           def create(client_oid, side, symbol, stop_price, options = {})
             options = { clientOid: client_oid, side:, symbol:, stopPrice: stop_price }.merge(options)
@@ -15,12 +20,16 @@ module Kucoin
           end
           alias place create
 
-          # https://www.kucoin.com/docs/rest/spot-trading/stop-order/get-stop-orders-list
-          def index(options = {})
-            auth.ku_request :get, :index, **options
+          # https://www.kucoin.com/docs/rest/spot-trading/stop-order/get-order-details-by-orderid
+          def show(order_id)
+            auth.ku_request :get, :show, order_id:
           end
-          alias all index
-          alias list index
+
+          # https://www.kucoin.com/docs/rest/spot-trading/stop-order/cancel-order-by-clientoid
+          def delete(order_id)
+            auth.ku_request :delete, :show, order_id:
+          end
+          alias cancel delete
         end
       end
     end

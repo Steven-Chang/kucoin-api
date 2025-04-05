@@ -53,7 +53,8 @@ module Kucoin
           repay: '/api/v3/margin/repay'
         },
         stops: {
-          index: '/api/v1/stop-order'
+          index: '/api/v1/stop-order',
+          show: '/api/v1/stop-order/:order_id'
         }
       },
       markets: {

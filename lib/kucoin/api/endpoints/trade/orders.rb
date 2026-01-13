@@ -13,6 +13,7 @@ module Kucoin
           end
           alias place create
 
+          # https://www.kucoin.com/docs-new/abandoned-endpoints/spot-trading/orders/get-orders-list-old
           def index(options = {})
             auth.ku_request :get, :index, **options
           end

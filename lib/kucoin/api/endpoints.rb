@@ -47,7 +47,7 @@ module Kucoin
           recent: '/api/v1/limit/fills'
         },
         margin: {
-          create: '/api/v1/margin/order',
+          create: '/api/v3/hf/margin/order',
           borrow: '/api/v3/margin/borrow',
           isolated_account: '/api/v1/isolated/account/:symbol',
           repay: '/api/v3/margin/repay'

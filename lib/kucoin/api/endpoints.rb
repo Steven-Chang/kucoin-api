@@ -39,6 +39,11 @@ module Kucoin
         orders: {
           # member
           show: '/api/v3/hf/margin/orders/:order_id'
+        },
+        stops: {
+          index: '/api/v3/hf/margin/stop-orders',
+          show: '/api/v3/hf/margin/stop-order/clientOid',
+          delete: '/api/v3/hf/margin/stop-order/cancel-by-id'
         }
       },
       trade: {

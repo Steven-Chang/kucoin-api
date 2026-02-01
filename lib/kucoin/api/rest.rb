@@ -3,7 +3,7 @@
 module Kucoin
   module Api
     class REST
-      BASE_URL = 'https://openapi-v2.kucoin.com'
+      BASE_URL = 'https://api.kucoin.com'
       FUTURES_BASE_URL = 'https://api-futures.kucoin.com'
       SANDBOX_BASE_URL = 'https://openapi-sandbox.kucoin.com'
 

@@ -35,6 +35,12 @@ module Kucoin
           delete: '/api/v1/withdrawals/:withdrawal_id'
         }
       },
+      margin: {
+        orders: {
+          # member
+          show: '/api/v3/hf/margin/orders/:order_id'
+        }
+      },
       trade: {
         orders: {
           index: '/api/v1/orders',

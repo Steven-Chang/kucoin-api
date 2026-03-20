@@ -2,7 +2,9 @@
 
 require 'json'
 require 'faraday'
-require 'faraday_middleware'
+require 'faraday/net_http'
+require 'faraday/request/json'
+require 'faraday/response/json'
 require 'faye/websocket'
 
 require 'kucoin/api/version'

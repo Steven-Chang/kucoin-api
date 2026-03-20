@@ -3,7 +3,7 @@
 module Kucoin
   module Api
     class REST
-      BASE_URL = 'https://api.kucoin.com'
+      BASE_URL = 'https://openapi-v2.kucoin.com'
       FUTURES_BASE_URL = 'https://api-futures.kucoin.com'
       SANDBOX_BASE_URL = 'https://openapi-sandbox.kucoin.com'
 
@@ -16,7 +16,7 @@ module Kucoin
         api_key: Kucoin::Api.default_key,
         api_secret: Kucoin::Api.default_secret,
         api_passphrase: Kucoin::Api.default_passphrase,
-        adapter: Faraday.default_adapter,
+        adapter: (Faraday.default_adapter || :net_http),
         sandbox: false,
         futures: false
       )

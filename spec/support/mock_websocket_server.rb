@@ -66,7 +66,9 @@ class MockWebsocketConnection < EventMachine::Connection
 
   def post_init
     logger.debug '[WEBSOCKET - SERVER] -- someone connected to the server!'
-    start_tls(verify_peer: true)
+    # These are test/self-signed certificates; disable peer verification so the
+    # Faye client can connect deterministically.
+    start_tls(verify_peer: false)
   end
 
   def write(data)

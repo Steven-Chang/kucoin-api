@@ -24,7 +24,7 @@ RSpec.describe Kucoin::Api::Endpoints::Trade::Orders, type: :endpoint do
     let(:request_path)    { '/api/v1/orders' }
     let(:request_method)  { :post }
     let(:request_body)    do
-      '{"clientOid":"client_oid1","side":"buy","symbol":"ETH-BTC","price":1.0e-06,"size":0.032411}'
+      '{"clientOid":"client_oid1","side":"buy","symbol":"ETH-BTC","price":0.000001,"size":0.032411}'
     end
     it {
       expect(subject.place('client_oid1', 'buy', 'ETH-BTC', price: 0.000001, size: 0.032411)).to eq({ 'foo' => 'bar' })

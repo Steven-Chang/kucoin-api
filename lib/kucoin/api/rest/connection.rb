@@ -8,7 +8,27 @@ module Kucoin
 
         def initialize(endpoint, options = {}, &block)
           @endpoint = endpoint
-          @client = ::Faraday.new(options, &block)
+          # Faraday 2 expects adapters to be configured via the Faraday
+          # connection builder (e.g. `conn.adapter :net_http`) rather than
+          # as a key in the options hash.
+          options = options.dup
+          explicit_adapter = options.delete(:adapter)
+          default_adapter = explicit_adapter || ::Faraday.default_adapter
+
+          builder_block = block
+          @client = ::Faraday.new(options) do |conn|
+            conn.adapter(default_adapter) if default_adapter
+
+            # Most of our API usage expects JSON. When this connection is
+            # constructed directly (e.g. in unit tests), there may be no
+            # outer builder block to install JSON middleware.
+            if builder_block
+              builder_block.call(conn)
+            else
+              conn.request :json
+              conn.response :json, content_type: 'application/json'
+            end
+          end
         end
 
         def ku_request(method, subpath, options = {})

@@ -22,3 +22,5 @@ Gemfile.lock
 
 # simplecov
 coverage
+
+kucoin-api.code-workspace

@@ -3,6 +3,9 @@
 module Kucoin
   module Api
     module Middleware
+      # Faraday 2 middleware entrypoint.
+      # The old `faraday_middleware` gem is deprecated; this adapter uses
+      # Faraday's built-in `Faraday::Middleware` API.
       class AuthRequest < Faraday::Middleware
         def initialize(app, api_key, api_secret, api_passphrase)
           super(app)

@@ -16,12 +16,12 @@ RSpec.describe Kucoin::Api::Endpoints::User::Accounts, type: :endpoint do
   end
 
   describe '#inner_transfer' do
-    let(:request_path)    { '/api/v1/accounts/inner-transfer' }
+    let(:request_path)    { '/api/v2/accounts/inner-transfer' }
     let(:request_method)  { :post }
     let(:request_body)    do
-      '{"clientOid":"t1","payAccountId":"payId","recAccountId":"recId","amount":10}'
+      '{"clientOid":"t1","currency":"USDT","from":"payId","to":"recId","amount":10}'
     end
-    it { expect(subject.inner_transfer('t1', 'payId', 'recId', 10)).to eq({ 'foo' => 'bar' }) }
+    it { expect(subject.inner_transfer('t1', 'USDT', 'payId', 'recId', 10)).to eq({ 'foo' => 'bar' }) }
   end
 
   describe '#show' do

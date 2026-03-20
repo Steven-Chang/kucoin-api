@@ -59,7 +59,7 @@ RSpec.describe Kucoin::Api::REST do
       expect(Kucoin::Api::REST::Connection).to receive(:new).with(endpoint,
                                                                   url: Kucoin::Api::REST::BASE_URL).and_call_original
       connection = subject.open(endpoint)
-      expect(connection.client.builder.handlers).to include(FaradayMiddleware::EncodeJson, FaradayMiddleware::ParseJson)
+      expect(connection.client.builder.handlers).to include(Faraday::Request::Json, Faraday::Response::Json)
     end
   end
 
@@ -69,8 +69,10 @@ RSpec.describe Kucoin::Api::REST do
       expect(Kucoin::Api::REST::Connection).to receive(:new).with(endpoint,
                                                                   url: Kucoin::Api::REST::BASE_URL).and_call_original
       connection = subject.auth(endpoint)
-      expect(connection.client.builder.handlers).to include(FaradayMiddleware::EncodeJson,
-                                                            FaradayMiddleware::ParseJson, Kucoin::Api::Middleware::NonceRequest, Kucoin::Api::Middleware::AuthRequest)
+      expect(connection.client.builder.handlers).to include(Faraday::Request::Json,
+                                                            Faraday::Response::Json,
+                                                            Kucoin::Api::Middleware::NonceRequest,
+                                                            Kucoin::Api::Middleware::AuthRequest)
     end
   end
 end

@@ -52,7 +52,7 @@ module Kucoin
       #   :error   - The Proc called when a stream receives an error (optional)
       #   :close   - The Proc called when a stream is closed (optional)
       def start(stream:, methods:)
-        channel = connect(private: !stream[:privateChannel].nil?, methods: methods)
+        channel = connect(private: !!stream[:privateChannel], methods: methods)
         self.class.subscribe channel: channel, params: stream
         channel
       end
@@ -65,7 +65,7 @@ module Kucoin
       #   :privateChannel - The user will only receive messages related himself on the topic(default is false)
       #
       def multiplex(stream:, methods:)
-        channel = connect(private: !stream[:privateChannel].nil?, methods: methods)
+        channel = connect(private: !!stream[:privateChannel], methods: methods)
         self.class.open_tunnel channel: channel, params: stream
         channel
       end
@@ -120,7 +120,17 @@ module Kucoin
 
       def get_client(response, params: {})
         url = ["#{response.endpoint}?token=#{response.token}", URI.encode_www_form(params)].join('&')
-        Faye::WebSocket::Client.new(url, [], ping: response.ping_interval)
+        # The mock websocket server used in specs runs with self-signed certs.
+        # Keep TLS verification on by default, but disable it for the mock host.
+        tls_opts = {}
+        uri = URI.parse(url)
+        tls_opts[:verify_peer] = false if uri.host == '0.0.0.0'
+
+        if tls_opts.empty?
+          Faye::WebSocket::Client.new(url, [], ping: response.ping_interval)
+        else
+          Faye::WebSocket::Client.new(url, [], ping: response.ping_interval, tls: tls_opts)
+        end
       end
 
       def create_stream(websocket, methods:)

@@ -38,7 +38,8 @@ module Kucoin
       margin: {
         orders: {
           # member
-          show: '/api/v3/hf/margin/orders/:order_id'
+          show: '/api/v3/hf/margin/orders/:order_id',
+          cancel_all_orders_by_symbol: '/api/v3/hf/margin/orders'
         },
         stops: {
           index: '/api/v3/hf/margin/stop-orders',
@@ -51,7 +52,8 @@ module Kucoin
           index: '/api/v1/orders',
           recent: '/api/v1/limit/orders',
           # member
-          show: '/api/v1/orders/:order_id'
+          show: '/api/v1/orders/:order_id',
+          cancel_all_orders_by_symbol: '/api/v1/hf/orders'
         },
         fills: {
           index: '/api/v1/fills',

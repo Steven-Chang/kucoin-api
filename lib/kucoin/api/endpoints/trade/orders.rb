@@ -20,10 +20,9 @@ module Kucoin
           alias all index
           alias list index
 
-          def delete_all(options = {})
-            auth.ku_request :delete, :index, **options
+          def cancel_all_orders_by_symbol(symbol)
+            auth.ku_request :delete, :cancel_all_orders_by_symbol, symbol:
           end
-          alias cancel_all delete_all
 
           def recent
             auth.ku_request :get, :recent

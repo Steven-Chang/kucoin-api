@@ -8,6 +8,12 @@ RSpec.describe Kucoin::Api::Endpoints::Trade::Fills, type: :endpoint do
     it { expect(subject.method(:list) == subject.method(:all)).to be_truthy }
   end
 
+  describe '#hf_index' do
+    let(:request_path) { '/api/v1/hf/fills?symbol=BTC-USDT' }
+    it { expect(subject.hf_index('BTC-USDT')).to eq({ 'foo' => 'bar' }) }
+    it { expect(subject.method(:hf_index) == subject.method(:hf_list)).to be_truthy }
+  end
+
   describe '#recent' do
     let(:request_path) { '/api/v1/limit/fills' }
     it { expect(subject.recent).to eq({ 'foo' => 'bar' }) }

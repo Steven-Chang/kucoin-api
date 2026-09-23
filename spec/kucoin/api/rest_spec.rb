@@ -5,7 +5,7 @@ RSpec.describe Kucoin::Api::REST do
   let(:endpoint) { Kucoin::Api::Endpoints::Base.new(client) }
   subject { client }
 
-  it { expect(described_class::BASE_URL).to eq 'https://openapi-v2.kucoin.com' }
+  it { expect(described_class::BASE_URL).to eq 'https://api.kucoin.com' }
   it { expect(described_class::SANDBOX_BASE_URL).to eq 'https://openapi-sandbox.kucoin.com' }
 
   describe 'endpoint_methods' do

@@ -4,18 +4,17 @@ This is an unofficial Ruby wrapper for the Kucoin exchange REST and WebSocket AP
 
 ##### Notice
 
-* This is Alpha software.  All issues should be aggressively reported for quick resolution!
-* RESTful interface is fully implemented.
-* Websocket is fully implemented.
-* Pull Requests are very welcome!
-* RSPEC tests depend on Ruby >= 2.4 features, specifically `#match?`  The gem itself should work find with any Ruby 2.x and higher and perhaps 1.9.x, but has certainly not been tested. YMMV!
+* Version 1.0.0 uses `https://api.kucoin.com` as the default REST host.
+* Several older REST methods remain and still call KuCoin paths listed under Abandoned Endpoints. New code should use the successor methods named in [Upgrading to 1.0.0](#upgrading-to-100).
+* Requires Ruby 3.0 or newer.
+* Pull requests are welcome.
 
 ## Installation
 
 Add this line to your application's Gemfile:
 
 ```ruby
-gem 'kucoin-api'
+gem 'kucoin-api', '~> 1.0'
 ```
 
 And then execute:
@@ -25,6 +24,25 @@ And then execute:
 Or install it yourself as:
 
     $ gem install kucoin-api
+
+## Upgrading to 1.0.0
+
+`Kucoin::Api::REST` now sends requests to `https://api.kucoin.com`. Version 0.2.1 used `https://openapi-v2.kucoin.com`. Method names and paths from 0.2.1 are unchanged, so a Gemfile constraint of `~> 0.2` stays on that release.
+
+KuCoin documents some of those paths under Abandoned Endpoints. The old methods still call them. Prefer the current Classic methods:
+
+| Previous method | Current method |
+| --- | --- |
+| `user.accounts.inner_transfer` | `user.accounts.flex_transfer` |
+| `user.deposits.create` and `user.deposits.get` | `user.deposits.create_v3` and `user.deposits.show_v3` |
+| `user.withdrawals.apply` | `user.withdrawals.create_v3` |
+| `trade.orders.place`, `list`, `recent`, `get`, and `cancel` | `trade.orders.hf_place`, `hf_active`, `hf_closed`, `hf_show`, and `hf_cancel` |
+| `trade.fills.list` and `trade.fills.recent` | `trade.fills.hf_index` |
+| `trade.margin.isolated_account` | `trade.margin.isolated_accounts` |
+
+`user.deposits.list` and `user.withdrawals.list` already call the current history URLs. `user.funding.isolated` calls the same isolated-margin URL as `trade.margin.isolated_accounts`.
+
+Parameter and response details are in the [KuCoin API docs](https://www.kucoin.com/docs-new).
 
 ## Features
 
@@ -76,7 +94,7 @@ client = Kucoin::Api::REST.new sandbox: true
 
 |**Environment**        |**BaseUri**                            |
 |:---------------------:|:-------------------------------------:|
-| Production `DEFAULT`  | https://openapi-v2.kucoin.com         |
+| Production `DEFAULT`  | https://api.kucoin.com                |
 | Sandbox               | https://openapi-sandbox.kucoin.com    |
 
 ALTERNATIVELY, set your API key in exported environment variable:
@@ -92,52 +110,27 @@ Then you can instantiate client without parameters as in first variation above.
 Create various requests:
 
 ```ruby
-# Others / Time / Server Time
+# Server time
 client.other.timestamp
-  # => 1554213599244
 
-# Currencies Plugin / List exchange rate of coins
-client.currency.all
-  # => {"rates"=>{"TRAC"=>{"CHF"=>0.02, "HRK"=>0.14...}}
+# All symbols
+client.markets.symbols.all
 
-# Public Market Data / Tick
-client.market.tick(symbol: 'KCS-BTC')
-  # => {"coinType"=>"KCS", "trading"=>true, "symbol"=>"KCS-BTC", "lastDealPrice"=>0.00016493,
-  #     "buy"=>0.00016493, "sell"=>0.00016697, "change"=>2.41e-06, "coinTypePair"=>"BTC", "sort"=>0,
-  #     "feeRate"=>0.001, "volValue"=>19.92555026, "high"=>0.00016888, "datetime"=>1546427934000,
-  #     "vol"=>120465.9024, "low"=>0.000161, "changeRate"=>0.0148
-  #   }
+# All tickers
+client.markets.tickers.all
 
+# Place a spot order on the current high-frequency endpoint
+client.trade.orders.hf_place 'BTC-USDT', 'buy', 'limit', price: '50000', size: '0.00001'
 
-# Trading / Create an order
-client.order.create 'KCS-BTC', type: 'BUY', price: 0.000127, amount: 22
-  # => { "orderOid": "596186ad07015679730ffa02" }
-
-
-# Assets Operation / Get coin deposit address
-client.account.wallet_address('KCS')
-  # => {
-  #       "oid": "598aeb627da3355fa3e851ca",
-  #       "address": "598aeb627da3355fa3e851ca",
-  #       "context": null,
-  #       "userOid": "5969ddc96732d54312eb960e",
-  #       "coinType": "KCS",
-  #       "createdAt": 1502276446000,
-  #       "deletedAt": null,
-  #       "updatedAt": 1502276446000,
-  #       "lastReceivedAt": 1502276446000
-  #     }
+# Deposit addresses for a currency
+client.user.deposits.show_v3 'USDT', chain: 'trx'
 ```
 
-Required and optional parameters, as well as enum values, can currently be found on the [Kucoin Apiary Page](https://docs.kucoin.com). Parameters should always be passed to client methods as keyword arguments in snake_case form.  symbol, when a required parameter is simply passed as first parameter for most API calls.
+Each call returns the `data` field from a KuCoin response whose `code` is `200000`. Pass optional parameters as keyword arguments in snake_case. Where a symbol is required, pass it as the first argument. Enum values are listed in the [KuCoin API docs](https://www.kucoin.com/docs-new).
 
 ### REST Endpoints
 
-REST endpoints are in order as documented on the Kucoin Apiary page (linked above). 
-Endpoints are accessible by following resourceful structure given in Kucoin API documentation. For example - `user.accounts` is for endpoints given in Kucoin API documentation under "User/Accounts". 
-The following lists only the method names, aliases (if any) and parameters of the methods to access endpoints. 
-For the most part, method names follow RESTful action names and alias method follows the title/name given in Kucoin API documentation. 
-There were some deviations where there would otherwise be name clashes/overloading.
+These examples use the resource objects on a `Kucoin::Api::REST` client, such as `client.user` and `client.trade`. Methods return the parsed `data` field. A method marked abandoned still works and calls the old KuCoin URL. Prefer the successor named beside it.
 
 #### User
 
@@ -184,6 +177,16 @@ user.accounts.holds account_id
 user.accounts.inner_transfer client_oid, currency, from, to, amount, options = {}
 ```
 * required params: client_oid, currency, from, to, amount
+* Abandoned. Use `flex_transfer`.
+
+----
+```ruby
+# Flex Transfer
+user.accounts.flex_transfer client_oid, type, currency, amount, from_account_type, to_account_type, options = {}
+```
+* required params: client_oid, type, currency, amount, from_account_type, to_account_type
+* `type` must be one of `INTERNAL`, `PARENT_TO_SUB`, `SUB_TO_PARENT`, `SUB_TO_SUB`
+* Pass `fromUserId` or `toUserId` in `options` for master and sub-account transfers.
 
 ##### Deposits
 ----
@@ -193,6 +196,15 @@ user.accounts.inner_transfer client_oid, currency, from, to, amount, options = {
 user.deposits.create currency
 ```
 * required params: currency
+* Abandoned. Use `create_v3`.
+
+----
+```ruby
+# Create Deposit Address (V3)
+user.deposits.create_v3 currency, chain, options = {}
+```
+* required params: currency, chain
+* optional: `to` (`main` or `trade`)
 
 ----
 ```ruby
@@ -200,6 +212,15 @@ user.deposits.create currency
 user.deposits.get currency
 ```
 * required params: currency
+* Abandoned. Use `show_v3`.
+
+----
+```ruby
+# Get Deposit Address (V3)
+user.deposits.show_v3 currency, options = {}
+```
+* required params: currency
+* optional: `chain`
 
 ----
 ```ruby
@@ -230,6 +251,22 @@ user.withdrawals.quotas currency
 user.withdrawals.apply currency, address, amount, options={}
 ```
 * required params: currency, address, amount
+* Abandoned. Use `create_v3`.
+
+----
+```ruby
+# Apply Withdraw (V3)
+user.withdrawals.create_v3 currency, to_address, amount, chain, options = {}
+```
+* required params: currency, to_address, amount, chain
+* `withdrawType` defaults to `ADDRESS`
+
+----
+```ruby
+# Get Withdrawal By ID
+user.withdrawals.show withdrawal_id
+```
+* required params: withdrawal_id
 
 ----
 ```ruby
@@ -248,6 +285,7 @@ user.withdrawals.cancel withdrawal_id
 trade.orders.place client_oid, side, symbol, options={}
 ```
 * required params: client_oid, side, symbol
+* Abandoned. Use `hf_place`.
 
 ----
 ```ruby
@@ -255,13 +293,14 @@ trade.orders.place client_oid, side, symbol, options={}
 trade.orders.cancel order_id
 ```
 * required params: order_id
+* Abandoned. Use `hf_cancel`.
 
 ----
 ```ruby
-# Cancel all orders
-trade.orders.cancel_all options={}
+# Cancel all open orders for a symbol
+trade.orders.cancel_all_orders_by_symbol symbol
 ```
-* required params: none
+* required params: symbol
 
 ----
 ```ruby
@@ -269,6 +308,7 @@ trade.orders.cancel_all options={}
 trade.orders.list options={}
 ```
 * required params: none
+* Abandoned. Use `hf_active` for open orders and `hf_closed` for done orders.
 
 ----
 ```ruby
@@ -276,6 +316,7 @@ trade.orders.list options={}
 trade.orders.recent
 ```
 * required params: none
+* Abandoned. Use `hf_active`.
 
 ----
 ```ruby
@@ -283,6 +324,43 @@ trade.orders.recent
 trade.orders.get order_id
 ```
 * required params: order_id
+* Abandoned. Use `hf_show`.
+
+----
+```ruby
+# Place a high-frequency order
+trade.orders.hf_place symbol, side, type, options = {}
+```
+* required params: symbol, side, type
+* `type` must be `limit` or `market`
+
+----
+```ruby
+# Open high-frequency orders
+trade.orders.hf_active symbol, options = {}
+```
+* required params: symbol
+
+----
+```ruby
+# Closed high-frequency orders
+trade.orders.hf_closed symbol, options = {}
+```
+* required params: symbol
+
+----
+```ruby
+# Get a high-frequency order
+trade.orders.hf_show order_id, symbol
+```
+* required params: order_id, symbol
+
+----
+```ruby
+# Cancel a high-frequency order
+trade.orders.hf_cancel order_id, symbol
+```
+* required params: order_id, symbol
 
 ##### Fills
 ----
@@ -292,6 +370,7 @@ trade.orders.get order_id
 trade.fills.list
 ```
 * required params: none
+* Abandoned. Use `hf_index`.
 
 ----
 ```ruby
@@ -299,6 +378,24 @@ trade.fills.list
 trade.fills.recent
 ```
 * required params: none
+* Abandoned. Use `hf_index`.
+
+----
+```ruby
+# High-frequency fills
+trade.fills.hf_index symbol, options = {}
+```
+* required params: symbol
+
+##### Margin
+----
+
+```ruby
+# Isolated margin accounts
+trade.margin.isolated_accounts options = {}
+```
+* `isolated_account` calls a disabled endpoint. Pass `symbol` and `queryType` here.
+* `user.funding.isolated` calls the same URL.
 
 #### Market Data
 
@@ -306,14 +403,14 @@ trade.fills.recent
 ----
 
 ```ruby
-# Get Symbols List
+# Get Market List
 markets.all
 ```
 * required params: none
 
 ----
 ```ruby
-# Get Ticker
+# Get 24hr Stats
 markets.stats symbol
 ```
 * required params: symbol
@@ -327,14 +424,14 @@ markets.tickers.all
 
 ----
 ```ruby
-# Get 24hr Stats
+# Get Level 1 Order Book
 markets.tickers.inside symbol
 ```
 * required params: symbol
 
 ----
 ```ruby
-# Get Market List
+# Get Symbols List
 markets.symbols.all options={}
 ```
 * required params: none
@@ -421,7 +518,7 @@ Create a new instance of the WebSocket Client:
 client = Kucoin::Api::Websocket.new
 
 # Changing the rest_client argument for different authentication
-client = Kucoin::Api::Websocket.new rest_client: Kucoin::Api::REST.new(sendbox: true) 
+client = Kucoin::Api::Websocket.new rest_client: Kucoin::Api::REST.new(sandbox: true) 
 ```
 
 Subscribe various topics:
@@ -475,7 +572,7 @@ Proc is the expected value of each event handler key. Following are list of expe
 
 ### Websocket Feed
 
-Subscribe topics are in order as documented on the Kucoin Apiary page (linked above).
+Subscribe topics follow the Classic WebSocket topics in the [KuCoin API docs](https://www.kucoin.com/docs-new).
 
 #### Public Channels
 ----

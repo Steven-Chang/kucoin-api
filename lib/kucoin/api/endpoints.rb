@@ -10,6 +10,7 @@ module Kucoin
         accounts: {
           index: '/api/v1/accounts',
           inner_transfer: '/api/v2/accounts/inner-transfer',
+          flex_transfer: '/api/v3/accounts/universal-transfer',
           # member
           show: '/api/v1/accounts/:account_id',
           ledgers: '/api/v1/accounts/:account_id/ledgers',
@@ -19,9 +20,11 @@ module Kucoin
         },
         deposits: {
           create: '/api/v1/deposit-addresses',
+          create_v3: '/api/v3/deposit-address/create',
           index: '/api/v1/deposits',
           # member
-          show: '/api/v1/deposit-addresses?currency=:currency'
+          show: '/api/v1/deposit-addresses?currency=:currency',
+          show_v3: '/api/v3/deposit-addresses'
         },
         funding: {
           cross: '/api/v3/margin/accounts',
@@ -30,9 +33,11 @@ module Kucoin
         },
         withdrawals: {
           index: '/api/v1/withdrawals',
+          create_v3: '/api/v3/withdrawals',
           quotas: '/api/v1/withdrawals/quotas',
           # member
-          delete: '/api/v1/withdrawals/:withdrawal_id'
+          delete: '/api/v1/withdrawals/:withdrawal_id',
+          show: '/api/v1/withdrawals/:withdrawal_id'
         }
       },
       margin: {
@@ -53,16 +58,22 @@ module Kucoin
           recent: '/api/v1/limit/orders',
           # member
           show: '/api/v1/orders/:order_id',
-          cancel_all_orders_by_symbol: '/api/v1/hf/orders'
+          cancel_all_orders_by_symbol: '/api/v1/hf/orders',
+          hf_create: '/api/v1/hf/orders',
+          hf_active: '/api/v1/hf/orders/active/page',
+          hf_closed: '/api/v1/hf/orders/done',
+          hf_show: '/api/v1/hf/orders/:order_id'
         },
         fills: {
           index: '/api/v1/fills',
-          recent: '/api/v1/limit/fills'
+          recent: '/api/v1/limit/fills',
+          hf_index: '/api/v1/hf/fills'
         },
         margin: {
           create: '/api/v3/hf/margin/order',
           borrow: '/api/v3/margin/borrow',
           isolated_account: '/api/v1/isolated/account/:symbol',
+          isolated_accounts: '/api/v3/isolated/accounts',
           repay: '/api/v3/margin/repay'
         },
         stops: {

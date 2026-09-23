@@ -16,7 +16,7 @@ module Kucoin
         api_key: Kucoin::Api.default_key,
         api_secret: Kucoin::Api.default_secret,
         api_passphrase: Kucoin::Api.default_passphrase,
-        adapter: (Faraday.default_adapter || :net_http),
+        adapter: Faraday.default_adapter || :net_http,
         sandbox: false,
         futures: false
       )

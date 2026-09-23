@@ -5,8 +5,8 @@ RSpec.shared_context 'endpoint', shared_context: :metadata do
   let(:endpoint) { described_class.new(client) }
   subject { endpoint }
 
-  let(:endpoint_url)    { 'v1/base/all' }
-  let(:auth_request)    { false }
+  let(:endpoint_url) { 'v1/base/all' }
+  let(:auth_request) { false }
 
   let(:request_method)  { :get }
   let(:request_path)    { 'http://example.com' }

@@ -76,7 +76,7 @@ client = Kucoin::Api::REST.new sandbox: true
 
 |**Environment**        |**BaseUri**                            |
 |:---------------------:|:-------------------------------------:|
-| Production `DEFAULT`  | https://openapi-v2.kucoin.com         |
+| Production `DEFAULT`  | https://api.kucoin.com                |
 | Sandbox               | https://openapi-sandbox.kucoin.com    |
 
 ALTERNATIVELY, set your API key in exported environment variable:
@@ -184,6 +184,16 @@ user.accounts.holds account_id
 user.accounts.inner_transfer client_oid, currency, from, to, amount, options = {}
 ```
 * required params: client_oid, currency, from, to, amount
+* KuCoin lists this endpoint as abandoned. Use `flex_transfer`.
+
+----
+```ruby
+# Flex Transfer
+user.accounts.flex_transfer client_oid, type, currency, amount, from_account_type, to_account_type, options = {}
+```
+* required params: client_oid, type, currency, amount, from_account_type, to_account_type
+* `type` must be one of `INTERNAL`, `PARENT_TO_SUB`, `SUB_TO_PARENT`, `SUB_TO_SUB`
+* Pass `fromUserId` or `toUserId` in `options` for master and sub-account transfers.
 
 ##### Deposits
 ----
@@ -193,6 +203,15 @@ user.accounts.inner_transfer client_oid, currency, from, to, amount, options = {
 user.deposits.create currency
 ```
 * required params: currency
+* KuCoin lists this endpoint as abandoned. Use `create_v3`.
+
+----
+```ruby
+# Create Deposit Address (V3)
+user.deposits.create_v3 currency, chain, options = {}
+```
+* required params: currency, chain
+* optional: `to` (`main` or `trade`)
 
 ----
 ```ruby
@@ -200,6 +219,15 @@ user.deposits.create currency
 user.deposits.get currency
 ```
 * required params: currency
+* KuCoin lists this endpoint as abandoned. Use `show_v3`.
+
+----
+```ruby
+# Get Deposit Address (V3)
+user.deposits.show_v3 currency, options = {}
+```
+* required params: currency
+* optional: `chain`
 
 ----
 ```ruby
@@ -230,6 +258,22 @@ user.withdrawals.quotas currency
 user.withdrawals.apply currency, address, amount, options={}
 ```
 * required params: currency, address, amount
+* KuCoin lists this endpoint as abandoned. Use `create_v3`.
+
+----
+```ruby
+# Apply Withdraw (V3)
+user.withdrawals.create_v3 currency, to_address, amount, chain, options = {}
+```
+* required params: currency, to_address, amount, chain
+* `withdrawType` defaults to `ADDRESS`
+
+----
+```ruby
+# Get Withdrawal By ID
+user.withdrawals.show withdrawal_id
+```
+* required params: withdrawal_id
 
 ----
 ```ruby
@@ -283,6 +327,43 @@ trade.orders.recent
 trade.orders.get order_id
 ```
 * required params: order_id
+* KuCoin lists place, cancel, list, recent, and get as abandoned. Use the `hf_` methods.
+
+----
+```ruby
+# Place a high-frequency order
+trade.orders.hf_place symbol, side, type, options = {}
+```
+* required params: symbol, side, type
+* `type` must be `limit` or `market`
+
+----
+```ruby
+# Open high-frequency orders
+trade.orders.hf_active symbol, options = {}
+```
+* required params: symbol
+
+----
+```ruby
+# Closed high-frequency orders
+trade.orders.hf_closed symbol, options = {}
+```
+* required params: symbol
+
+----
+```ruby
+# Get a high-frequency order
+trade.orders.hf_show order_id, symbol
+```
+* required params: order_id, symbol
+
+----
+```ruby
+# Cancel a high-frequency order
+trade.orders.hf_cancel order_id, symbol
+```
+* required params: order_id, symbol
 
 ##### Fills
 ----
@@ -299,6 +380,24 @@ trade.fills.list
 trade.fills.recent
 ```
 * required params: none
+* KuCoin lists list and recent as abandoned. Use `hf_index`.
+
+----
+```ruby
+# High-frequency fills
+trade.fills.hf_index symbol, options = {}
+```
+* required params: symbol
+
+##### Margin
+----
+
+```ruby
+# Isolated margin accounts
+trade.margin.isolated_accounts options = {}
+```
+* `isolated_account` calls a disabled endpoint. Pass `symbol` and `queryType` here.
+* `user.funding.isolated` calls the same URL.
 
 #### Market Data
 

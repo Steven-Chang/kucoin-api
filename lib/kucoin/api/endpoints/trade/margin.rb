@@ -18,9 +18,15 @@ module Kucoin
             auth.ku_request :post, :borrow, **options
           end
 
+          # Abandoned and disabled. KuCoin recommends isolated_accounts.
           # https://www.kucoin.com/docs/rest/margin-trading/isolated-margin/get-single-isolated-margin-account-info
           def isolated_account(symbol)
             auth.ku_request :get, :isolated_account, symbol:
+          end
+
+          # https://www.kucoin.com/docs-new/rest/account-info/account-funding/get-account-isolated-margin
+          def isolated_accounts(options = {})
+            auth.ku_request :get, :isolated_accounts, **options
           end
 
           # https://www.kucoin.com/docs/rest/margin-trading/margin-trading-v3-/repayment

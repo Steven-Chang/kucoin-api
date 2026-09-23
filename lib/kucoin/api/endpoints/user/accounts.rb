@@ -17,10 +17,24 @@ module Kucoin
           alias all index
           alias list index
 
-          # Updated to v2
+          # Abandoned. KuCoin recommends flex_transfer.
           def inner_transfer(client_oid, currency, from, to, amount, options = {})
             auth.ku_request :post, :inner_transfer, clientOid: client_oid, currency: currency, from: from, to: to,
                                                     amount: amount, **options
+          end
+
+          # https://www.kucoin.com/docs-new/rest/account-info/transfer/flex-transfer
+          def flex_transfer(client_oid, type, currency, amount, from_account_type, to_account_type, options = {})
+            options = {
+              clientOid: client_oid,
+              type: type,
+              currency: currency,
+              amount: amount,
+              fromAccountType: from_account_type,
+              toAccountType: to_account_type
+            }.merge(options)
+            assert_param_is_one_of options, :type, %w[INTERNAL PARENT_TO_SUB SUB_TO_PARENT SUB_TO_SUB]
+            auth.ku_request :post, :flex_transfer, **options
           end
 
           def show(account_id)

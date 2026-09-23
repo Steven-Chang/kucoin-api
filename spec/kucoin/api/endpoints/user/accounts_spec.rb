@@ -24,6 +24,17 @@ RSpec.describe Kucoin::Api::Endpoints::User::Accounts, type: :endpoint do
     it { expect(subject.inner_transfer('t1', 'USDT', 'payId', 'recId', 10)).to eq({ 'foo' => 'bar' }) }
   end
 
+  describe '#flex_transfer' do
+    let(:request_path)    { '/api/v3/accounts/universal-transfer' }
+    let(:request_method)  { :post }
+    let(:request_body)    do
+      '{"clientOid":"t1","type":"INTERNAL","currency":"USDT","amount":10,"fromAccountType":"MAIN","toAccountType":"TRADE"}'
+    end
+    it {
+      expect(subject.flex_transfer('t1', 'INTERNAL', 'USDT', 10, 'MAIN', 'TRADE')).to eq({ 'foo' => 'bar' })
+    }
+  end
+
   describe '#show' do
     let(:request_path) { '/api/v1/accounts/123' }
     it { expect(subject.show(123)).to eq({ 'foo' => 'bar' }) }
